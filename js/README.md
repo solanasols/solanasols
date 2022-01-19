@@ -1,6 +1,6 @@
 ## Setup
 
-Be sure to be running Node v12.16.2 and yarn version 1.22.10.
+Be sure to be running Node v14.17.6 and yarn version 1.22.10.
 
 `yarn bootstrap`
 
@@ -28,4 +28,3 @@ Then, test that css transpiling is working:
 ## ⚠️ Warning
 
 Any content produced by Solana, or developer resources that Solana provides, are for educational and inspiration purposes only. Solana does not encourage, induce or sanction the deployment of any such applications in violation of applicable laws or regulations.
-

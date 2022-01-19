@@ -2,7 +2,6 @@ import {
   MasterEditionV1,
   MetadataKey,
   ParsedAccount,
-  TokenAccount,
   useUserAccounts,
 } from '@oyster/common';
 import BN from 'bn.js';
@@ -12,17 +11,12 @@ import {
   ParticipationConfigV2,
   WinningConfigType,
   WinningConstraint,
-} from '../models/metaplex';
+} from '@oyster/common/dist/lib/models/metaplex/index';
 import { useMeta } from './../contexts';
 
 export const useUserArts = (): SafetyDepositDraft[] => {
   const { metadata, masterEditions, editions } = useMeta();
-  const { userAccounts } = useUserAccounts();
-
-  const accountByMint = userAccounts.reduce((prev, acc) => {
-    prev.set(acc.info.mint.toBase58(), acc);
-    return prev;
-  }, new Map<string, TokenAccount>());
+  const { accountByMint } = useUserAccounts();
 
   const ownedMetadata = metadata.filter(
     m =>
@@ -38,10 +32,10 @@ export const useUserArts = (): SafetyDepositDraft[] => {
     m.info.masterEdition ? masterEditions[m.info.masterEdition] : undefined,
   );
 
-  let safetyDeposits: SafetyDepositDraft[] = [];
+  const safetyDeposits: SafetyDepositDraft[] = [];
   let i = 0;
   ownedMetadata.forEach(m => {
-    let a = accountByMint.get(m.info.mint);
+    const a = accountByMint.get(m.info.mint);
     let masterA;
     const masterEdition = possibleMasterEditions[i];
     if (masterEdition?.info.key == MetadataKey.MasterEditionV1) {

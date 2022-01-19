@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Layout,
   Row,
@@ -12,7 +12,10 @@ import {
   Divider,
 } from 'antd';
 import { useMeta } from '../../contexts';
-import { Store, WhitelistedCreator } from '../../models/metaplex';
+import {
+  Store,
+  WhitelistedCreator,
+} from '@oyster/common/dist/lib/models/metaplex/index';
 import {
   MasterEditionV1,
   notify,
@@ -21,7 +24,8 @@ import {
   StringPublicKey,
   useConnection,
   useStore,
-  useUserAccounts, useWalletModal,
+  useUserAccounts,
+  useWalletModal,
   WalletSigner,
 } from '@oyster/common';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -33,6 +37,7 @@ import {
 } from '../../actions/convertMasterEditions';
 import { Link } from 'react-router-dom';
 import { SetupVariables } from '../../components/SetupVariables';
+import { cacheAllAuctions } from '../../actions/cacheAllAuctions';
 
 const { Content } = Layout;
 export const AdminView = () => {
@@ -47,7 +52,12 @@ export const AdminView = () => {
   const { storeAddress, setStoreForOwner, isConfigured } = useStore();
 
   useEffect(() => {
-    if (!store && !storeAddress && wallet.publicKey) {
+    if (
+      !store &&
+      !storeAddress &&
+      wallet.publicKey &&
+      !process.env.NEXT_PUBLIC_STORE_OWNER_ADDRESS
+    ) {
       setStoreForOwner(wallet.publicKey.toBase58());
     }
   }, [store, storeAddress, wallet.publicKey]);
@@ -112,6 +122,7 @@ function ArtistModal({
   return (
     <>
       <Modal
+        className={'modal-box'}
         title="Add New Artist Address"
         visible={modalOpen}
         onOk={() => {
@@ -188,6 +199,7 @@ function InnerAdminView({
     }>();
   const [loading, setLoading] = useState<boolean>();
   const { metadata, masterEditions } = useMeta();
+  const state = useMeta();
 
   const { accountByMint } = useUserAccounts();
   useMemo(() => {
@@ -258,7 +270,7 @@ function InnerAdminView({
   ];
 
   return (
-    <Content>
+    <Content className={'admin-content'}>
       <Col style={{ marginTop: 10 }}>
         <Row>
           <Col span={21}>
@@ -353,6 +365,21 @@ function InnerAdminView({
           </Col>{' '}
         </>
       )}
+      <Col>
+        <p style={{'marginTop': '30px'}}>Upgrade the performance of your existing auctions.</p>
+        <Row>
+          <Button
+            disabled={loading}
+            onClick={async () => {
+              setLoading(true);
+              await cacheAllAuctions(wallet, connection, state);
+              setLoading(false);
+            }}
+          >
+            {loading ? <Spin /> : <span>Upgrade Auction Performance</span>}
+          </Button>
+        </Row>
+      </Col>
     </Content>
   );
 }

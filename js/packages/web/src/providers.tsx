@@ -3,34 +3,37 @@ import {
   ConnectionProvider,
   StoreProvider,
   WalletProvider,
+  MetaProvider,
 } from '@oyster/common';
-import { FC } from 'react';
-import { UseWalletProvider } from 'use-wallet';
+import React, { FC } from 'react';
 import { ConfettiProvider } from './components/Confetti';
 import { AppLayout } from './components/Layout';
-import { MetaProvider } from './contexts/meta';
+import { LoaderProvider } from './components/Loader';
 import { CoingeckoProvider } from './contexts/coingecko';
+import { SPLTokenListProvider } from './contexts/tokenList';
 
 export const Providers: FC = ({ children }) => {
   return (
     <ConnectionProvider>
       <WalletProvider>
-        <UseWalletProvider chainId={5}>
-          <AccountsProvider>
+        <AccountsProvider>
+          <SPLTokenListProvider>
             <CoingeckoProvider>
               <StoreProvider
                 ownerAddress={process.env.NEXT_PUBLIC_STORE_OWNER_ADDRESS}
                 storeAddress={process.env.NEXT_PUBLIC_STORE_ADDRESS}
               >
                 <MetaProvider>
-                  <ConfettiProvider>
-                    <AppLayout>{children}</AppLayout>
-                  </ConfettiProvider>
+                  <LoaderProvider>
+                    <ConfettiProvider>
+                      <AppLayout>{children}</AppLayout>
+                    </ConfettiProvider>
+                  </LoaderProvider>
                 </MetaProvider>
               </StoreProvider>
             </CoingeckoProvider>
-          </AccountsProvider>
-        </UseWalletProvider>
+          </SPLTokenListProvider>
+        </AccountsProvider>
       </WalletProvider>
     </ConnectionProvider>
   );
